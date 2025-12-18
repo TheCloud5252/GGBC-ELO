@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống ELO Cầu Lông</title>
+    <style>
+        :root { --p: #667eea; --s: #764ba2; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 15px; }
+        .card { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .status { padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 15px; font-weight: bold; }
+        .ok { background: #d4edda; color: #155724; }
+        .err { background: #f8d7da; color: #721c24; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; }
+        button { background: var(--p); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .badge { background: var(--p); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2 style="text-align:center; color:var(--s)">🏸 ELO Badminton</h2>
+    
+    <div id="connStatus" class="status err">🔴 Chưa kết nối</div>
+
+    <div id="configArea">
+        <input type="text" id="urlInput" placeholder="Dán Web App URL vào đây...">
+        <button onclick="connect()">Kết nối ngay</button>
+    </div>
+
+    <div id="mainApp" style="display:none">
+        <hr>
+        <h4>Thêm Người Chơi</h4>
+        <input type="text" id="newName" placeholder="Tên người chơi...">
+        <button onclick="addPlayer()" style="background:#28a745">Thêm</button>
+        
+        <hr>
+        <h4>Bảng Xếp Hạng</h4>
+        <div id="playerList">Đang tải...</div>
+    </div>
+</div>
+
+<script>
+    let SCRIPT_URL = localStorage.getItem('elo_url') || '';
+
+    if (SCRIPT_URL) {
+        document.getElementById('urlInput').value = SCRIPT_URL;
+        connect();
+    }
+
+    async function connect() {
+        const url = document.getElementById('urlInput').value.trim();
+        const statusDiv = document.getElementById('connStatus');
+        
+        statusDiv.className = "status";
+        statusDiv.innerText = "🔄 Đang kiểm tra...";
+
+        try {
+            const response = await fetch(`${url}?action=getPlayers`);
+            const result = await response.json();
+
+            if (result.status === "success") {
+                SCRIPT_URL = url;
+                localStorage.setItem('elo_url', url);
+                statusDiv.classList.add('ok');
+                statusDiv.innerText = "✅ Đã kết nối thành công!";
+                document.getElementById('configArea').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                renderPlayers(result.data);
+            }
+        } catch (e) {
+            statusDiv.classList.add('err');
+            statusDiv.innerText = "❌ Lỗi kết nối URL (CORS hoặc Sai URL)";
+            console.error(e);
+        }
+    }
+
+    function renderPlayers(data) {
+        const list = document.getElementById('playerList');
+        if (!data || data.length === 0) {
+            list.innerHTML = "Chưa có người chơi nào.";
+            return;
+        }
+        list.innerHTML = data.sort((a,b) => b[2] - a[2]).map(p => `
+            <div class="list-item">
+                <span><b>${p[1]}</b></span>
+                <span><span class="badge">ELO: ${p[2]}</span></span>
+            </div>
+        `).join('');
+    }
+
+    async function addPlayer() {
+        const name = document.getElementById('newName').value;
+        if (!name) return alert("Nhập tên!");
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'addPlayer', data: { name: name } })
+            });
+            alert("Đã gửi yêu cầu thêm! Vui lòng đợi 2s rồi tải lại.");
+            setTimeout(connect, 2000);
+            document.getElementById('newName').value = "";
+        } catch (e) {
+            alert("Lỗi khi thêm!");
+        }
+    }
+</script>
+</body>
+</html>
