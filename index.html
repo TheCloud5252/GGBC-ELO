@@ -3,111 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giải Cầu Lông Ao Làng Khu Vườn Nhỏ</title>
+    <title>Badminton ELO - Bảng Vàng Danh Vọng</title>
     <style>
         :root { --p: #667eea; --s: #764ba2; --success: #28a745; --danger: #dc3545; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 15px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 10px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
         
-        /* Trạng thái kết nối ngầm */
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; text-align: center; }
         .status { padding: 8px; text-align: center; font-weight: bold; font-size: 0.8em; transition: 0.3s; }
         .status-ok { background: #d4edda; color: #155724; }
         .status-err { background: #f8d7da; color: #721c24; }
-        .status-loading { background: #fff3cd; color: #856404; }
 
-        /* Tabs */
         .tabs { display: flex; background: #f5f5f5; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; }
-        .tab { flex: 1; padding: 15px 5px; text-align: center; cursor: pointer; border: none; font-weight: bold; color: #666; font-size: 0.9em; }
+        .tab { flex: 1; padding: 15px 5px; text-align: center; cursor: pointer; border: none; font-weight: bold; color: #666; font-size: 0.85em; }
         .tab.active { background: white; color: var(--p); border-bottom: 3px solid var(--p); }
-        .tab-content { display: none; padding: 20px; }
+        .tab-content { display: none; padding: 20px; animation: fadeIn 0.4s; }
         .tab-content.active { display: block; }
 
-        /* Rank Badges */
-        .rank-badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.7em; font-weight: bold; text-transform: uppercase; margin-top: 5px; color: white; }
-        .rank-gold { background: linear-gradient(135deg, #FFD700, #FFA500); }
-        .rank-platinum { background: linear-gradient(135deg, #E5E4E2, #4A9EAF); }
-        .rank-diamond { background: linear-gradient(135deg, #B9F2FF, #1E90FF); }
-        .rank-master { background: linear-gradient(135deg, #9370DB, #4B0082); }
-        .rank-legend { background: linear-gradient(135deg, #FF0000, #8B0000); box-shadow: 0 0 8px rgba(255,0,0,0.4); }
+        /* Hiệu ứng Rank */
+        @keyframes legendGlow { 0% { box-shadow: 0 0 5px #ff0000; } 50% { box-shadow: 0 0 20px #ff0000; } 100% { box-shadow: 0 0 5px #ff0000; } }
+        @keyframes shine { to { background-position: 200% center; } }
+        
+        .rank-group { margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid #eee; }
+        .group-legend { border: 2px solid #ff0000; animation: legendGlow 2s infinite; }
+        .group-master { border: 2px solid #9370DB; }
+        
+        .rank-group-header { padding: 12px 15px; font-weight: bold; color: white; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-size: 0.8em; letter-spacing: 1px; }
+        .bg-legend { background: linear-gradient(90deg, #b30000, #ff0000, #b30000); background-size: 200% auto; animation: shine 3s linear infinite; }
+        .bg-master { background: linear-gradient(90deg, #4B0082, #9370DB); }
+        .bg-diamond { background: linear-gradient(90deg, #104E8B, #1E90FF); }
+        .bg-platinum { background: linear-gradient(90deg, #2F4F4F, #4A9EAF); }
+        .bg-gold { background: #daa520; }
 
-        /* Form & List */
+        .player-row { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; align-items: center; }
+        .empty-msg { padding: 15px; text-align: center; color: #bbb; font-style: italic; font-size: 0.85em; background: #fafafa; }
+        
+        .name-legend { color: #ff0000; font-weight: 900 !important; }
+        .name-master { color: #4B0082; font-weight: 800 !important; }
+
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        button { background: var(--p); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .player-card { background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid var(--p); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .history-item { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #ccc; font-size: 0.9em; }
-        .history-score { color: var(--p); font-weight: bold; font-size: 1.1em; }
+        button { background: var(--p); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+        
+        .type-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .type-btn { flex: 1; padding: 10px; background: #eee; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; font-size: 0.9em; }
+        .type-btn.active { background: var(--s); color: white; }
+        .doubles-field { display: none; }
+        .history-item { background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--p); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>🏸 Giải Cầu Lông Ao Làng</h1>
-        <p>Hệ thống xếp hạng Rank tự động</p>
+        <h1>🏸 GIẢI AO LÀNG PRO</h1>
+        <p>Bảng Vàng Danh Vọng - Khu Vườn Nhỏ</p>
     </div>
 
-    <div id="connStatus" class="status status-loading">🔄 Đang đồng bộ dữ liệu...</div>
+    <div id="connStatus" class="status status-err">🔴 Đang kết nối dữ liệu...</div>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('ranking')">Xếp Hạng</div>
-        <div class="tab" onclick="switchTab('match')">Ghi Trận</div>
+        <div class="tab active" onclick="switchTab('ranking')">Bảng Xếp Hạng</div>
+        <div class="tab" onclick="switchTab('match')">Ghi Kết Quả</div>
         <div class="tab" onclick="switchTab('history')">Lịch Sử</div>
         <div class="tab" onclick="switchTab('add')">Thêm VĐV</div>
     </div>
 
     <div id="ranking" class="tab-content active">
-        <div id="playerList">Đang tải bảng xếp hạng...</div>
+        <div id="playerList">Đang tải dữ liệu...</div>
     </div>
 
     <div id="match" class="tab-content">
+        <div class="type-selector">
+            <div id="btnSingles" class="type-btn active" onclick="setMode('singles')">Đánh Đơn</div>
+            <div id="btnDoubles" class="type-btn" onclick="setMode('doubles')">Đánh Đôi</div>
+        </div>
         <div style="display:flex; gap:10px;">
             <div style="flex:1">
-                <label style="font-size:0.8em; font-weight:bold;">ĐỘI 1</label>
+                <label style="font-size:0.7em; font-weight:bold;">ĐỘI 1</label>
                 <select id="t1p1" class="p-select"></select>
+                <select id="t1p2" class="p-select doubles-field"></select>
                 <input type="number" id="s1" value="21">
             </div>
             <div style="flex:1">
-                <label style="font-size:0.8em; font-weight:bold;">ĐỘI 2</label>
+                <label style="font-size:0.7em; font-weight:bold;">ĐỘI 2</label>
                 <select id="t2p1" class="p-select"></select>
+                <select id="t2p2" class="p-select doubles-field"></select>
                 <input type="number" id="s2" value="0">
             </div>
         </div>
-        <button onclick="recordMatch()" id="btnMatch">Xác Nhận Lưu Kết Quả</button>
+        <button onclick="recordMatch()" id="btnSubmitMatch">Lưu Kết Quả</button>
     </div>
 
     <div id="history" class="tab-content">
-        <div id="matchHistory">Chưa có lịch sử thi đấu.</div>
+        <div id="matchHistory">Chưa có lịch sử.</div>
     </div>
 
     <div id="add" class="tab-content">
-        <input type="text" id="newName" placeholder="Nhập tên vận động viên...">
-        <button onclick="addPlayer()" id="btnAdd" style="background:var(--success)">Đăng Ký Thành Viên</button>
+        <input type="text" id="newName" placeholder="Họ và tên VĐV...">
+        <button onclick="addPlayer()" id="btnAdd" style="background:var(--success)">Đăng Ký VĐV</button>
     </div>
 </div>
 
 <script>
-    // URL ĐÃ ĐƯỢC GÁN CỨNG (AUTO CONNECT)
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKwnpWmYZfKnM4-mbIZjLQMrLvOH91iOzlAT8SgEcH9harS2sp8e-gsCGbM-cSoFr-/exec';
     let globalPlayers = [];
+    let currentMode = 'singles';
 
-    // Tự động kết nối khi mở trang
     window.onload = connect;
 
     function switchTab(id) {
         document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
-        event.currentTarget.classList.add('active');
+        if(event) event.currentTarget.classList.add('active');
         document.getElementById(id).classList.add('active');
         if(id === 'history') loadHistory();
     }
 
-    function getRank(elo) {
-        if (elo < 1200) return {n:'Vàng', c:'gold'};
-        if (elo < 1500) return {n:'Bạch Kim', c:'platinum'};
-        if (elo < 1800) return {n:'Kim Cương', c:'diamond'};
-        if (elo < 2100) return {n:'Cao Thủ', c:'master'};
-        return {n:'Huyền Thoại', c:'legend'};
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btnSingles').classList.toggle('active', mode === 'singles');
+        document.getElementById('btnDoubles').classList.toggle('active', mode === 'doubles');
+        document.querySelectorAll('.doubles-field').forEach(el => el.style.display = (mode === 'doubles' ? 'block' : 'none'));
     }
 
     async function connect() {
@@ -117,32 +136,53 @@
             const json = await res.json();
             if(json.status === "success") {
                 status.className = "status status-ok";
-                status.innerText = "✅ Đã kết nối dữ liệu";
+                status.innerText = "✅ Đã đồng bộ dữ liệu";
                 globalPlayers = json.data;
                 renderRanking();
                 renderSelects();
             }
-        } catch(e) {
-            status.className = "status status-err";
-            status.innerText = "❌ Lỗi kết nối máy chủ";
-        }
+        } catch(e) { status.innerText = "❌ Lỗi kết nối máy chủ"; }
     }
 
     function renderRanking() {
+        const list = document.getElementById('playerList');
+        // Định nghĩa cố định các bậc hạng
+        const tiers = [
+            { id: 'legend', name: '🔥 HUYỀN THOẠI (≥2100)', min: 2100, bg: 'bg-legend', group: 'group-legend', nClass: 'name-legend', empty: 'Vị trí này đang chờ chủ nhân...' },
+            { id: 'master', name: '🔮 CAO THỦ (1800-2099)', min: 1800, bg: 'bg-master', group: 'group-master', nClass: 'name-master', empty: 'Chưa có cao thủ lộ diện' },
+            { id: 'diamond', name: '💠 KIM CƯƠNG (1500-1799)', min: 1500, bg: 'bg-diamond', group: '', nClass: '', empty: 'Đang chờ người leo hạng' },
+            { id: 'platinum', name: '💎 BẠCH KIM (1200-1499)', min: 1200, bg: 'bg-platinum', group: '', nClass: '', empty: 'Chưa có VĐV ở mức này' },
+            { id: 'gold', name: '🟡 VÀNG (0-1199)', min: 0, bg: 'bg-gold', group: '', nClass: '', empty: 'Danh sách trống' }
+        ];
+
+        let html = "";
         const sorted = [...globalPlayers].sort((a,b) => b[2] - a[2]);
-        document.getElementById('playerList').innerHTML = sorted.map((p, i) => {
-            const r = getRank(p[2]);
-            return `
-            <div class="player-card">
-                <div>
-                    <b>${i+1}. ${p[1]}</b> <small style="color:#888">(${p[3]} trận)</small><br>
-                    <span class="rank-badge rank-${r.c}">${r.n}</span>
+
+        tiers.forEach((tier, index) => {
+            const playersInTier = sorted.filter(p => {
+                const elo = p[2];
+                if (tier.id === 'legend') return elo >= tier.min;
+                const nextTierMin = tiers[index - 1].min;
+                return elo >= tier.min && elo < nextTierMin;
+            });
+
+            html += `
+            <div class="rank-group ${tier.group}">
+                <div class="rank-group-header ${tier.bg}">
+                    <span>${tier.name}</span>
+                    <span style="font-size:0.8em">${playersInTier.length} VĐV</span>
                 </div>
-                <div style="text-align:right">
-                    <span style="font-size:1.4em; font-weight:bold; color:var(--p)">${p[2]}</span>
-                </div>
+                ${playersInTier.length > 0 
+                    ? playersInTier.map(p => `
+                        <div class="player-row">
+                            <span class="${tier.nClass}"><b>${p[1]}</b> <small style="color:#999;font-weight:normal">(${p[3]} trận)</small></span>
+                            <b style="color:var(--p)">${p[2]}</b>
+                        </div>`).join('')
+                    : `<div class="empty-msg">${tier.empty}</div>`
+                }
             </div>`;
-        }).join('');
+        });
+        list.innerHTML = html;
     }
 
     function renderSelects() {
@@ -152,65 +192,48 @@
 
     async function loadHistory() {
         const div = document.getElementById('matchHistory');
-        div.innerText = "🔄 Đang lấy lịch sử...";
+        div.innerText = "Đang tải...";
         try {
             const res = await fetch(`${SCRIPT_URL}?action=getMatches`);
             const json = await res.json();
-            if(json.data && json.data.length > 0) {
-                div.innerHTML = json.data.reverse().map(m => `
-                    <div class="history-item">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span><b>${m[2]}</b> vs <b>${m[3]}</b></span>
-                            <span class="history-score">${m[4]}</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; font-size:0.8em; color:#888;">
-                            <span>${new Date(m[7]).toLocaleDateString('vi-VN')}</span>
-                            <span style="color:var(--success)">+${m[5]} ELO</span>
-                        </div>
-                    </div>
-                `).join('');
-            } else { div.innerText = "Chưa có trận đấu nào được ghi nhận."; }
-        } catch(e) { div.innerText = "Không thể tải lịch sử."; }
-    }
-
-    async function addPlayer() {
-        const name = document.getElementById('newName').value.trim();
-        if(!name) return alert("Nhập tên VĐV!");
-        const btn = document.getElementById('btnAdd');
-        btn.disabled = true; btn.innerText = "Đang gửi...";
-        
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addPlayer', data: { name: name }})});
-        
-        alert("Đã gửi yêu cầu thêm!");
-        document.getElementById('newName').value = "";
-        btn.disabled = false; btn.innerText = "Đăng Ký Thành Viên";
-        setTimeout(connect, 2000);
+            div.innerHTML = json.data.reverse().slice(0, 15).map(m => `
+                <div class="history-item">
+                    <div style="display:flex; justify-content:space-between"><b>${m[2]} vs ${m[3]}</b><b style="color:var(--p)">${m[4]}</b></div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8em; color:#888; margin-top:5px;"><span>${new Date(m[7]).toLocaleDateString('vi-VN')}</span><span>±${m[5]} ELO</span></div>
+                </div>`).join('');
+        } catch(e) { div.innerText = "Không có dữ liệu."; }
     }
 
     async function recordMatch() {
-        const p1 = document.getElementById('t1p1').value;
-        const p2 = document.getElementById('t2p1').value;
-        const s1 = parseInt(document.getElementById('s1').value);
-        const s2 = parseInt(document.getElementById('s2').value);
-        if(!p1 || !p2 || p1 === p2) return alert("Chọn người chơi hợp lệ!");
+        const p1 = document.getElementById('t1p1').value, p2 = document.getElementById('t1p2').value;
+        const p3 = document.getElementById('t2p1').value, p4 = document.getElementById('t2p2').value;
+        const s1 = parseInt(document.getElementById('s1').value), s2 = parseInt(document.getElementById('s2').value);
 
-        const btn = document.getElementById('btnMatch');
-        btn.disabled = true; btn.innerText = "Đang lưu...";
+        const t1Ids = [p1, p2].filter(i => i), t2Ids = [p3, p4].filter(i => i);
+        if (t1Ids.length === 0 || t2Ids.length === 0) return alert("Vui lòng chọn VĐV!");
 
+        const btn = document.getElementById('btnSubmitMatch'); btn.disabled = true; btn.innerText = "Đang lưu...";
         const d = {
             action: 'recordMatch',
             data: {
-                type: 'singles', team1Ids: [p1], team2Ids: [p2],
-                team1Names: [globalPlayers.find(p => p[0] == p1)[1]],
-                team2Names: [globalPlayers.find(p => p[0] == p2)[1]],
+                type: currentMode, team1Ids: t1Ids, team2Ids: t2Ids,
+                team1Names: t1Ids.map(id => globalPlayers.find(p => p[0] == id)[1]),
+                team2Names: t2Ids.map(id => globalPlayers.find(p => p[0] == id)[1]),
                 score: s1 + "-" + s2, eloChange: 20, winner: s1 > s2 ? 1 : 2
             }
         };
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d)});
-        
-        alert("Đã lưu trận đấu!");
-        btn.disabled = false; btn.innerText = "Xác Nhận Lưu Kết Quả";
-        setTimeout(connect, 2000);
+        alert("Ghi trận thành công!"); btn.disabled = false; btn.innerText = "Lưu Kết Quả";
+        connect(); switchTab('ranking');
+    }
+
+    async function addPlayer() {
+        const name = document.getElementById('newName').value.trim();
+        if(!name) return;
+        const btn = document.getElementById('btnAdd'); btn.disabled = true;
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addPlayer', data: { name: name }})});
+        alert("Đã thêm!"); btn.disabled = false; document.getElementById('newName').value = "";
+        connect(); switchTab('ranking');
     }
 </script>
 </body>
