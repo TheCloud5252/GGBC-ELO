@@ -3,108 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống ELO Cầu Lông</title>
+    <title>Giải Cầu Lông Ao Làng Khu Vườn Nhỏ</title>
     <style>
-        :root { --p: #667eea; --s: #764ba2; }
-        body { font-family: sans-serif; background: #f4f7f6; padding: 15px; }
-        .card { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .status { padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 15px; font-weight: bold; }
-        .ok { background: #d4edda; color: #155724; }
-        .err { background: #f8d7da; color: #721c24; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; }
+        :root { --p: #667eea; --s: #764ba2; --success: #28a745; --danger: #dc3545; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 15px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; text-align: center; }
+        
+        /* Trạng thái kết nối ngầm */
+        .status { padding: 8px; text-align: center; font-weight: bold; font-size: 0.8em; transition: 0.3s; }
+        .status-ok { background: #d4edda; color: #155724; }
+        .status-err { background: #f8d7da; color: #721c24; }
+        .status-loading { background: #fff3cd; color: #856404; }
+
+        /* Tabs */
+        .tabs { display: flex; background: #f5f5f5; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; }
+        .tab { flex: 1; padding: 15px 5px; text-align: center; cursor: pointer; border: none; font-weight: bold; color: #666; font-size: 0.9em; }
+        .tab.active { background: white; color: var(--p); border-bottom: 3px solid var(--p); }
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; }
+
+        /* Rank Badges */
+        .rank-badge { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.7em; font-weight: bold; text-transform: uppercase; margin-top: 5px; color: white; }
+        .rank-gold { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .rank-platinum { background: linear-gradient(135deg, #E5E4E2, #4A9EAF); }
+        .rank-diamond { background: linear-gradient(135deg, #B9F2FF, #1E90FF); }
+        .rank-master { background: linear-gradient(135deg, #9370DB, #4B0082); }
+        .rank-legend { background: linear-gradient(135deg, #FF0000, #8B0000); box-shadow: 0 0 8px rgba(255,0,0,0.4); }
+
+        /* Form & List */
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
         button { background: var(--p); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .badge { background: var(--p); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
+        .player-card { background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid var(--p); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .history-item { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #ccc; font-size: 0.9em; }
+        .history-score { color: var(--p); font-weight: bold; font-size: 1.1em; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 style="text-align:center; color:var(--s)">🏸 ELO Badminton</h2>
-    
-    <div id="connStatus" class="status err">🔴 Chưa kết nối</div>
-
-    <div id="configArea">
-        <input type="text" id="urlInput" placeholder="Dán Web App URL vào đây...">
-        <button onclick="connect()">Kết nối ngay</button>
+<div class="container">
+    <div class="header">
+        <h1>🏸 Giải Cầu Lông Ao Làng</h1>
+        <p>Hệ thống xếp hạng Rank tự động</p>
     </div>
 
-    <div id="mainApp" style="display:none">
-        <hr>
-        <h4>Thêm Người Chơi</h4>
-        <input type="text" id="newName" placeholder="Tên người chơi...">
-        <button onclick="addPlayer()" style="background:#28a745">Thêm</button>
-        
-        <hr>
-        <h4>Bảng Xếp Hạng</h4>
-        <div id="playerList">Đang tải...</div>
+    <div id="connStatus" class="status status-loading">🔄 Đang đồng bộ dữ liệu...</div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('ranking')">Xếp Hạng</div>
+        <div class="tab" onclick="switchTab('match')">Ghi Trận</div>
+        <div class="tab" onclick="switchTab('history')">Lịch Sử</div>
+        <div class="tab" onclick="switchTab('add')">Thêm VĐV</div>
+    </div>
+
+    <div id="ranking" class="tab-content active">
+        <div id="playerList">Đang tải bảng xếp hạng...</div>
+    </div>
+
+    <div id="match" class="tab-content">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1">
+                <label style="font-size:0.8em; font-weight:bold;">ĐỘI 1</label>
+                <select id="t1p1" class="p-select"></select>
+                <input type="number" id="s1" value="21">
+            </div>
+            <div style="flex:1">
+                <label style="font-size:0.8em; font-weight:bold;">ĐỘI 2</label>
+                <select id="t2p1" class="p-select"></select>
+                <input type="number" id="s2" value="0">
+            </div>
+        </div>
+        <button onclick="recordMatch()" id="btnMatch">Xác Nhận Lưu Kết Quả</button>
+    </div>
+
+    <div id="history" class="tab-content">
+        <div id="matchHistory">Chưa có lịch sử thi đấu.</div>
+    </div>
+
+    <div id="add" class="tab-content">
+        <input type="text" id="newName" placeholder="Nhập tên vận động viên...">
+        <button onclick="addPlayer()" id="btnAdd" style="background:var(--success)">Đăng Ký Thành Viên</button>
     </div>
 </div>
 
-<script>let SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKwnpWmYZfKnM4-mbIZjLQMrLvOH91iOzlAT8SgEcH9harS2sp8e-gsCGbM-cSoFr-/exec';
+<script>
+    // URL ĐÃ ĐƯỢC GÁN CỨNG (AUTO CONNECT)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKwnpWmYZfKnM4-mbIZjLQMrLvOH91iOzlAT8SgEcH9harS2sp8e-gsCGbM-cSoFr-/exec';
+    let globalPlayers = [];
 
-    if (SCRIPT_URL) {
-        document.getElementById('urlInput').value = SCRIPT_URL;
-        connect();
+    // Tự động kết nối khi mở trang
+    window.onload = connect;
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        document.getElementById(id).classList.add('active');
+        if(id === 'history') loadHistory();
+    }
+
+    function getRank(elo) {
+        if (elo < 1200) return {n:'Vàng', c:'gold'};
+        if (elo < 1500) return {n:'Bạch Kim', c:'platinum'};
+        if (elo < 1800) return {n:'Kim Cương', c:'diamond'};
+        if (elo < 2100) return {n:'Cao Thủ', c:'master'};
+        return {n:'Huyền Thoại', c:'legend'};
     }
 
     async function connect() {
-        const url = document.getElementById('urlInput').value.trim();
-        const statusDiv = document.getElementById('connStatus');
-        
-        statusDiv.className = "status";
-        statusDiv.innerText = "🔄 Đang kiểm tra...";
-
+        const status = document.getElementById('connStatus');
         try {
-            const response = await fetch(`${url}?action=getPlayers`);
-            const result = await response.json();
-
-            if (result.status === "success") {
-                SCRIPT_URL = url;
-                localStorage.setItem('elo_url', url);
-                statusDiv.classList.add('ok');
-                statusDiv.innerText = "✅ Đã kết nối thành công!";
-                document.getElementById('configArea').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                renderPlayers(result.data);
+            const res = await fetch(`${SCRIPT_URL}?action=getPlayers`);
+            const json = await res.json();
+            if(json.status === "success") {
+                status.className = "status status-ok";
+                status.innerText = "✅ Đã kết nối dữ liệu";
+                globalPlayers = json.data;
+                renderRanking();
+                renderSelects();
             }
-        } catch (e) {
-            statusDiv.classList.add('err');
-            statusDiv.innerText = "❌ Lỗi kết nối URL (CORS hoặc Sai URL)";
-            console.error(e);
+        } catch(e) {
+            status.className = "status status-err";
+            status.innerText = "❌ Lỗi kết nối máy chủ";
         }
     }
 
-    function renderPlayers(data) {
-        const list = document.getElementById('playerList');
-        if (!data || data.length === 0) {
-            list.innerHTML = "Chưa có người chơi nào.";
-            return;
-        }
-        list.innerHTML = data.sort((a,b) => b[2] - a[2]).map(p => `
-            <div class="list-item">
-                <span><b>${p[1]}</b></span>
-                <span><span class="badge">ELO: ${p[2]}</span></span>
-            </div>
-        `).join('');
+    function renderRanking() {
+        const sorted = [...globalPlayers].sort((a,b) => b[2] - a[2]);
+        document.getElementById('playerList').innerHTML = sorted.map((p, i) => {
+            const r = getRank(p[2]);
+            return `
+            <div class="player-card">
+                <div>
+                    <b>${i+1}. ${p[1]}</b> <small style="color:#888">(${p[3]} trận)</small><br>
+                    <span class="rank-badge rank-${r.c}">${r.n}</span>
+                </div>
+                <div style="text-align:right">
+                    <span style="font-size:1.4em; font-weight:bold; color:var(--p)">${p[2]}</span>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderSelects() {
+        const h = '<option value="">--Chọn VĐV--</option>' + globalPlayers.map(p => `<option value="${p[0]}">${p[1]}</option>`).join('');
+        document.querySelectorAll('.p-select').forEach(s => s.innerHTML = h);
+    }
+
+    async function loadHistory() {
+        const div = document.getElementById('matchHistory');
+        div.innerText = "🔄 Đang lấy lịch sử...";
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getMatches`);
+            const json = await res.json();
+            if(json.data && json.data.length > 0) {
+                div.innerHTML = json.data.reverse().map(m => `
+                    <div class="history-item">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span><b>${m[2]}</b> vs <b>${m[3]}</b></span>
+                            <span class="history-score">${m[4]}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8em; color:#888;">
+                            <span>${new Date(m[7]).toLocaleDateString('vi-VN')}</span>
+                            <span style="color:var(--success)">+${m[5]} ELO</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else { div.innerText = "Chưa có trận đấu nào được ghi nhận."; }
+        } catch(e) { div.innerText = "Không thể tải lịch sử."; }
     }
 
     async function addPlayer() {
-        const name = document.getElementById('newName').value;
-        if (!name) return alert("Nhập tên!");
+        const name = document.getElementById('newName').value.trim();
+        if(!name) return alert("Nhập tên VĐV!");
+        const btn = document.getElementById('btnAdd');
+        btn.disabled = true; btn.innerText = "Đang gửi...";
+        
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addPlayer', data: { name: name }})});
+        
+        alert("Đã gửi yêu cầu thêm!");
+        document.getElementById('newName').value = "";
+        btn.disabled = false; btn.innerText = "Đăng Ký Thành Viên";
+        setTimeout(connect, 2000);
+    }
 
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: 'addPlayer', data: { name: name } })
-            });
-            alert("Đã gửi yêu cầu thêm! Vui lòng đợi 2s rồi tải lại.");
-            setTimeout(connect, 2000);
-            document.getElementById('newName').value = "";
-        } catch (e) {
-            alert("Lỗi khi thêm!");
-        }
+    async function recordMatch() {
+        const p1 = document.getElementById('t1p1').value;
+        const p2 = document.getElementById('t2p1').value;
+        const s1 = parseInt(document.getElementById('s1').value);
+        const s2 = parseInt(document.getElementById('s2').value);
+        if(!p1 || !p2 || p1 === p2) return alert("Chọn người chơi hợp lệ!");
+
+        const btn = document.getElementById('btnMatch');
+        btn.disabled = true; btn.innerText = "Đang lưu...";
+
+        const d = {
+            action: 'recordMatch',
+            data: {
+                type: 'singles', team1Ids: [p1], team2Ids: [p2],
+                team1Names: [globalPlayers.find(p => p[0] == p1)[1]],
+                team2Names: [globalPlayers.find(p => p[0] == p2)[1]],
+                score: s1 + "-" + s2, eloChange: 20, winner: s1 > s2 ? 1 : 2
+            }
+        };
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d)});
+        
+        alert("Đã lưu trận đấu!");
+        btn.disabled = false; btn.innerText = "Xác Nhận Lưu Kết Quả";
+        setTimeout(connect, 2000);
     }
 </script>
 </body>
