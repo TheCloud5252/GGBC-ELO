@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏸 Giải Ao Làng - FULL VERSION</title>
+    <title>🏸 Giải Ao Làng 🏸-</title>
     <style>
         :root { --p: #667eea; --s: #764ba2; --success: #28a745; --gold: #FFD700; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -78,10 +78,13 @@
         .bar-container { width: 100%; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin: 10px 0; }
         .bar-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: 1s; }
         .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
-        .ach-card { background: #fff; border: 1px solid #eee; padding: 12px 5px; border-radius: 12px; text-align: center; opacity: 0.3; filter: grayscale(1); }
+        .ach-card { background: #fff; border: 1px solid #eee; padding: 12px 8px; border-radius: 12px; text-align: center; opacity: 0.3; filter: grayscale(1); transition: all 0.3s; }
+        .ach-card:hover { transform: scale(1.05); }
         .ach-card.unlocked { opacity: 1; filter: grayscale(0); border-color: var(--gold); }
+        .ach-card.unlocked:hover { box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
         .ach-icon { font-size: 1.8em; }
         .ach-name { font-size: 0.75em; font-weight: bold; display: block; margin-top: 5px; }
+        .ach-desc { font-size: 0.65em; color: #666; display: block; margin-top: 3px; line-height: 1.2; }
         
         /* HISTORY */
         .history-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--p); }
@@ -242,39 +245,49 @@
             const totalMatches = p[3] || 1;
             const winRate = s.wins / totalMatches;
             
+            // ✅ XÁC ĐỊNH RANK HIỆN TẠI (chỉ 1 rank sáng)
+            const currentRankElo = p[2];
+            let currentRankName = '';
+            if (currentRankElo >= 2400) currentRankName = 'Huyền Thoại';
+            else if (currentRankElo >= 2100) currentRankName = 'Đại Cao Thủ';
+            else if (currentRankElo >= 1800) currentRankName = 'Cao Thủ';
+            else if (currentRankElo >= 1500) currentRankName = 'Kim Cương';
+            else if (currentRankElo >= 1200) currentRankName = 'Bạch Kim';
+            else currentRankName = 'Vàng';
+            
             const cats = [
                 { t: '🔥 CHIẾN THẮNG', a: [
-                    {n:'First Blood', i:'🥇', v: s.wins >= 1},
-                    {n:'Hot Streak', i:'🔥', v: (s.maxStreak||0) >= 3},
-                    {n:'On Fire', i:'⚡', v: (s.maxStreak||0) >= 5},
-                    {n:'Unstoppable', i:'💥', v: (s.maxStreak||0) >= 10},
-                    {n:'Legendary', i:'👑', v: (s.maxStreak||0) >= 20},
-                    {n:'Veteran', i:'🎖️', v: s.wins >= 10},
-                    {n:'Champion', i:'🏅', v: s.wins >= 25},
-                    {n:'Legend', i:'🏆', v: s.wins >= 50}
+                    {n:'First Blood', i:'🥇', v: s.wins >= 1, d:'Thắng trận đầu tiên'},
+                    {n:'Hot Streak', i:'🔥', v: (s.maxStreak||0) >= 3, d:'Thắng 3 trận liên tiếp'},
+                    {n:'On Fire', i:'⚡', v: (s.maxStreak||0) >= 5, d:'Thắng 5 trận liên tiếp'},
+                    {n:'Unstoppable', i:'💥', v: (s.maxStreak||0) >= 10, d:'Thắng 10 trận liên tiếp'},
+                    {n:'Legendary', i:'👑', v: (s.maxStreak||0) >= 20, d:'Thắng 20 trận liên tiếp'},
+                    {n:'Veteran', i:'🎖️', v: s.wins >= 10, d:'Thắng 10 trận'},
+                    {n:'Champion', i:'🏅', v: s.wins >= 25, d:'Thắng 25 trận'},
+                    {n:'Legend', i:'🏆', v: s.wins >= 50, d:'Thắng 50 trận'}
                 ]},
                 { t: '📊 THỐNG KÊ', a: [
-                    {n:'Giant Killer', i:'😈', v: (s.giantKills||0) >= 1},
-                    {n:'Perfect 70', i:'💯', v: (winRate >= 0.7 && totalMatches >= 20)},
-                    {n:'Consistent', i:'📈', v: (winRate >= 0.6 && totalMatches >= 30)},
-                    {n:'Grinder', i:'💪', v: totalMatches >= 30},
-                    {n:'Warrior', i:'⚔️', v: totalMatches >= 50},
-                    {n:'Master', i:'🥋', v: totalMatches >= 100}
+                    {n:'Giant Killer', i:'😈', v: (s.giantKills||0) >= 1, d:'Thắng người cao hơn 300 ELO'},
+                    {n:'Perfect 70', i:'💯', v: (winRate >= 0.7 && totalMatches >= 20), d:'Tỷ lệ thắng 70%+ (min 20 trận)'},
+                    {n:'Consistent', i:'📈', v: (winRate >= 0.6 && totalMatches >= 30), d:'Tỷ lệ thắng 60%+ (min 30 trận)'},
+                    {n:'Grinder', i:'💪', v: totalMatches >= 30, d:'Chơi 30 trận'},
+                    {n:'Warrior', i:'⚔️', v: totalMatches >= 50, d:'Chơi 50 trận'},
+                    {n:'Master', i:'🥋', v: totalMatches >= 100, d:'Chơi 100 trận'}
                 ]},
                 { t: '👑 RANK', a: [
-                    {n:'Vàng', i:'🟡', v: p[2] >= 1000},
-                    {n:'Bạch Kim', i:'💎', v: p[2] >= 1200},
-                    {n:'Kim Cương', i:'💠', v: p[2] >= 1500},
-                    {n:'Cao Thủ', i:'🔮', v: p[2] >= 1800},
-                    {n:'Đại Cao Thủ', i:'👑', v: p[2] >= 2100},
-                    {n:'Huyền Thoại', i:'🏆', v: p[2] >= 2400}
+                    {n:'Vàng', i:'🟡', v: currentRankName === 'Vàng', d:'1000-1200 ELO'},
+                    {n:'Bạch Kim', i:'💎', v: currentRankName === 'Bạch Kim', d:'1200-1500 ELO'},
+                    {n:'Kim Cương', i:'💠', v: currentRankName === 'Kim Cương', d:'1500-1800 ELO'},
+                    {n:'Cao Thủ', i:'🔮', v: currentRankName === 'Cao Thủ', d:'1800-2100 ELO'},
+                    {n:'Đại Cao Thủ', i:'👑', v: currentRankName === 'Đại Cao Thủ', d:'2100-2400 ELO'},
+                    {n:'Huyền Thoại', i:'🏆', v: currentRankName === 'Huyền Thoại', d:'2400+ ELO'}
                 ]},
                 { t: '🌟 ĐẶC BIỆT', a: [
-                    {n:'Comeback', i:'🦅', v: (s.comebacks||0) >= 1},
-                    {n:'Early Bird', i:'🌅', v: (s.morningGames||0) >= 5},
-                    {n:'Night Owl', i:'🦉', v: (s.nightGames||0) >= 5},
-                    {n:'Số 1', i:'🎖️', v: s.isFirst === true},
-                    {n:'Butterfly', i:'🦋', v: (s.uniqueOpponents||0) >= 10}
+                    {n:'Comeback', i:'🦅', v: (s.comebacks||0) >= 1, d:'Thắng sau thua 3 trận liên tiếp'},
+                    {n:'Early Bird', i:'🌅', v: (s.morningGames||0) >= 5, d:'Chơi 5 trận buổi sáng (5-9h)'},
+                    {n:'Night Owl', i:'🦉', v: (s.nightGames||0) >= 5, d:'Chơi 5 trận buổi tối (18-22h)'},
+                    {n:'Số 1', i:'🎖️', v: s.isFirst === true, d:'VĐV đầu tiên của giải'},
+                    {n:'Butterfly', i:'🦋', v: (s.uniqueOpponents||0) >= 10, d:'Đấu với 10 người khác nhau'}
                 ]}
             ];
 
@@ -286,7 +299,12 @@
                 html += `<div style="background:#eee; padding:8px; border-radius:8px; margin-top:15px; font-size:0.85em; font-weight:bold;">${cat.t}</div><div class="ach-grid">`;
                 cat.a.forEach(ach => {
                     if(ach.v) totalUnlocked++;
-                    html += `<div class="ach-card ${ach.v ? 'unlocked' : ''}"><span class="ach-icon">${ach.i}</span><span class="ach-name">${ach.n}</span></div>`;
+                    html += `
+                    <div class="ach-card ${ach.v ? 'unlocked' : ''}">
+                        <span class="ach-icon">${ach.i}</span>
+                        <span class="ach-name">${ach.n}</span>
+                        <span class="ach-desc">${ach.d}</span>
+                    </div>`;
                 });
                 html += `</div>`;
             });
