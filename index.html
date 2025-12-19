@@ -3,99 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏸 Giải Ao Làng Khu Vườn Nhỏ 🏸- Hệ Thống ELO & Thành Tựu</title>
+    <title>🏸 Giải Ao Làng - FULL VERSION</title>
     <style>
-        :root { --p: #667eea; --s: #764ba2; --success: #28a745; --gold: #FFD700; --legend: #FF1493; }
+        :root { --p: #667eea; --s: #764ba2; --success: #28a745; --gold: #FFD700; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 10px; color: #333; }
-        .container { max-width: 650px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-        
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 10px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; text-align: center; }
         .tabs { display: flex; background: #f5f5f5; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; }
-        .tab { flex: 1; padding: 15px 5px; text-align: center; cursor: pointer; border: none; font-weight: bold; color: #666; font-size: 0.85em; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-weight: bold; color: #666; font-size: 0.85em; border: none; }
         .tab.active { background: white; color: var(--p); border-bottom: 3px solid var(--p); }
-        .tab-content { display: none; padding: 15px; animation: fadeIn 0.4s; }
+        .tab-content { display: none; padding: 15px; }
         .tab-content.active { display: block; }
-
-        /* RANK STYLE */
-        @keyframes legendGlow { 0% { box-shadow: 0 0 5px #ff0000; } 50% { box-shadow: 0 0 20px #ff0000; } 100% { box-shadow: 0 0 5px #ff0000; } }
-        @keyframes gmGlow { 0% { box-shadow: 0 0 5px #ff1493; } 50% { box-shadow: 0 0 15px #ff1493; } 100% { box-shadow: 0 0 5px #ff1493; } }
+        
+        /* RANK GROUPS */
+        @keyframes legendGlow { 0%, 100% { box-shadow: 0 0 5px #ff0000; } 50% { box-shadow: 0 0 20px #ff0000; } }
+        @keyframes gmGlow { 0%, 100% { box-shadow: 0 0 5px #ff1493; } 50% { box-shadow: 0 0 15px #ff1493; } }
         .rank-group { margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #fff; border: 1px solid #eee; }
         .group-legend { border: 2px solid #ff0000; animation: legendGlow 2s infinite; }
         .group-grandmaster { border: 2px solid #ff1493; animation: gmGlow 2s infinite; }
-        .rank-group-header { padding: 10px 15px; font-weight: bold; color: white; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; font-size: 0.75em; letter-spacing: 1px; }
+        .rank-group-header { padding: 10px 15px; font-weight: bold; color: white; display: flex; justify-content: space-between; text-transform: uppercase; font-size: 0.75em; }
         .bg-legend { background: linear-gradient(90deg, #b30000, #ff0000, #b30000); }
         .bg-grandmaster { background: linear-gradient(90deg, #8B008B, #FF1493); }
         .bg-master { background: linear-gradient(90deg, #4B0082, #9370DB); }
         .bg-diamond { background: linear-gradient(90deg, #104E8B, #1E90FF); }
         .bg-platinum { background: linear-gradient(90deg, #2F4F4F, #4A9EAF); }
         .bg-gold { background: #daa520; }
-        .player-row { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; align-items: center; }
-        .view-ach-btn { background: none; border: 1px solid var(--p); color: var(--p); padding: 4px 10px; border-radius: 6px; font-size: 0.7em; cursor: pointer; margin-left: 10px; font-weight: bold; }
-
-        /* LỊCH SỬ CARD */
-        .history-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--p); }
-        .hist-date { font-size: 0.75em; color: #888; display: block; margin-bottom: 5px; }
-        .hist-players { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .team-name { flex: 1; font-size: 0.9em; font-weight: 600; }
-        .hist-score { background: var(--p); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; min-width: 65px; text-align: center; }
-
-        /* MODAL THÀNH TỰU */
+        .player-row { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 12px 15px; 
+            border-bottom: 1px solid #f0f0f0; 
+            align-items: center; 
+        }
+        
+        /* ✅ FIX: Container cho tên và button */
+        .player-info-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .player-name {
+            min-width: 100px;
+        }
+        
+        /* ✅ FIX: Button width cố định - GIỮ TEXT */
+        .view-ach-btn { 
+            background: none; 
+            border: 1px solid var(--p); 
+            color: var(--p); 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-size: 0.7em; 
+            cursor: pointer; 
+            font-weight: bold;
+            white-space: nowrap;
+            width: 95px; /* ← WIDTH CỐ ĐỊNH ĐỂ CHỨA "🏆 Thành tựu" */
+            text-align: center;
+        }
+        
+        .player-elo {
+            color: var(--p);
+            font-weight: bold;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        /* MODAL */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); overflow-y: auto; padding: 10px; }
-        .modal-content { background: white; max-width: 550px; margin: 20px auto; border-radius: 20px; padding: 20px; position: relative; }
-        .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
-        .ach-card { background: #fff; border: 1px solid #eee; padding: 10px 5px; border-radius: 10px; text-align: center; opacity: 0.3; filter: grayscale(1); transition: 0.3s; }
-        .ach-card.unlocked { opacity: 1; filter: grayscale(0); border-color: var(--gold); background: #fffdf0; box-shadow: 0 0 8px rgba(255,215,0,0.3); }
-        .ach-icon { font-size: 1.8em; display: block; }
-        .ach-name { font-size: 0.8em; font-weight: bold; display: block; }
-        .ach-desc { font-size: 0.65em; color: #777; line-height: 1.2; }
-
+        .modal-content { background: white; max-width: 600px; margin: 20px auto; border-radius: 20px; padding: 20px; position: relative; }
+        .close-modal { position: absolute; right: 20px; top: 15px; font-size: 30px; cursor: pointer; color: #999; }
+        .bar-container { width: 100%; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: 1s; }
+        .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+        .ach-card { background: #fff; border: 1px solid #eee; padding: 12px 5px; border-radius: 12px; text-align: center; opacity: 0.3; filter: grayscale(1); }
+        .ach-card.unlocked { opacity: 1; filter: grayscale(0); border-color: var(--gold); }
+        .ach-icon { font-size: 1.8em; }
+        .ach-name { font-size: 0.75em; font-weight: bold; display: block; margin-top: 5px; }
+        
+        /* HISTORY */
+        .history-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--p); }
+        .hist-date { font-size: 0.75em; color: #888; font-weight: bold; margin-bottom: 5px; }
+        .hist-type { font-size: 0.7em; background: #eee; padding: 2px 8px; border-radius: 4px; color: #555; text-transform: uppercase; margin-bottom: 8px; display: inline-block; }
+        .hist-players { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 5px; }
+        .team-name { flex: 1; font-size: 0.9em; font-weight: 600; }
+        .hist-score { background: var(--p); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; min-width: 60px; text-align: center; }
+        .hist-elo { font-size: 0.75em; color: var(--success); text-align: center; margin-top: 5px; font-weight: bold; }
+        
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>🏸 GIẢI AO LÀNG PRO</h1>
-        <p>Thứ hạng VĐV & Thành tựu</p>
+        <h1>🏸 GIẢI CẦU LÔNG AO LÀNG</h1>
+        <p>Khu Vườn Nhỏ - Rank & Thành Tựu</p>
     </div>
 
     <div class="tabs">
         <div class="tab active" onclick="switchTab('ranking')">Xếp Hạng</div>
         <div class="tab" onclick="switchTab('match')">Ghi Trận</div>
         <div class="tab" onclick="switchTab('history')">Lịch Sử</div>
-        <div class="tab" onclick="switchTab('add')">Thành Viên</div>
+        <div class="tab" onclick="switchTab('add')">VĐV Mới</div>
     </div>
 
     <div id="ranking" class="tab-content active"><div id="playerList">Đang tải...</div></div>
-
+    
     <div id="match" class="tab-content">
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
             <button onclick="setMode('singles')" id="btnS" style="background:var(--s); color:white">Đơn</button>
             <button onclick="setMode('doubles')" id="btnD" style="background:#ccc; color:white">Đôi</button>
         </div>
         <div style="display:flex; gap:10px;">
-            <div style="flex:1"><select id="t1p1" class="p-select"></select><select id="t1p2" class="p-select" style="display:none"></select><input type="number" id="s1" value="21"></div>
-            <div style="flex:1"><select id="t2p1" class="p-select"></select><select id="t2p2" class="p-select" style="display:none"></select><input type="number" id="s2" value="0"></div>
+            <div style="flex:1">
+                <select id="t1p1" class="p-select"></select>
+                <select id="t1p2" class="p-select" style="display:none"></select>
+                <input type="number" id="s1" value="21">
+            </div>
+            <div style="flex:1">
+                <select id="t2p1" class="p-select"></select>
+                <select id="t2p2" class="p-select" style="display:none"></select>
+                <input type="number" id="s2" value="0">
+            </div>
         </div>
-        <button onclick="recordMatch()" style="background:var(--p); color:white; font-weight:bold;">Lưu Kết Quả</button>
+        <button onclick="recordMatch()" style="background:var(--p); color:white; font-weight:bold;">Lưu Trận Đấu</button>
     </div>
 
-    <div id="history" class="tab-content"><div id="matchHistory"></div></div>
-
+    <div id="history" class="tab-content"><div id="matchHistory">Đang tải...</div></div>
+    
     <div id="add" class="tab-content">
-        <input type="text" id="newName" placeholder="Nhập tên VĐV...">
+        <input type="text" id="newName" placeholder="Tên VĐV...">
         <button onclick="addPlayer()" style="background:var(--success); color:white; font-weight:bold;">Đăng Ký</button>
     </div>
 </div>
 
 <div id="achModal" class="modal">
     <div class="modal-content">
-        <span onclick="closeModal()" style="position:absolute; right:20px; top:15px; font-size:30px; cursor:pointer; color:#999;">&times;</span>
-        <h2 id="modalName">Tên VĐV</h2>
-        <div id="modalRankInfo" style="font-weight:bold; font-size:0.9em; margin-bottom:15px;"></div>
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 id="modalName">VĐV</h2>
+        <div id="modalRankInfo" style="margin-bottom:10px;">Rank: -</div>
+        <div class="bar-container"><div id="achBar" class="bar-fill" style="width:0%"></div></div>
+        <p id="achText" style="font-size:0.9em; font-weight:bold; text-align:center; margin-bottom:15px;">0/27 thành tựu</p>
         <div id="achGridContainer"></div>
     </div>
 </div>
@@ -108,20 +159,18 @@
     window.onload = connect;
 
     async function connect() {
-        const res = await fetch(`${SCRIPT_URL}?action=getPlayers`);
-        const json = await res.json();
-        if(json.status === "success") {
-            globalPlayers = json.data;
-            renderRanking();
-            renderSelects();
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getPlayers`);
+            const json = await res.json();
+            if(json.status === "success") {
+                globalPlayers = json.data;
+                renderRanking();
+                renderSelects();
+            }
+        } catch(e) {
+            console.error("Connection error:", e);
+            document.getElementById('playerList').innerHTML = '<p style="text-align:center; color:red; padding:20px;">❌ Lỗi kết nối!</p>';
         }
-    }
-
-    function switchTab(id) {
-        document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
-        if(event) event.currentTarget.classList.add('active');
-        document.getElementById(id).classList.add('active');
-        if(id === 'history') loadHistory();
     }
 
     function getRankInfo(elo) {
@@ -139,66 +188,188 @@
         const sorted = [...globalPlayers].sort((a,b) => b[2] - a[2]);
         tiers.forEach((minElo, idx) => {
             const info = getRankInfo(minElo);
-            const playersInTier = sorted.filter(p => idx === 0 ? p[2] >= 2400 : p[2] >= minElo && p[2] < tiers[idx-1]);
-            html += `<div class="rank-group ${info.g || ''}"><div class="rank-group-header ${info.bg}"><span>${info.ic} ${info.n}</span><span>${playersInTier.length} VĐV</span></div>
-                ${playersInTier.length > 0 ? playersInTier.map(p => `<div class="player-row"><div><b>${p[1]}</b> <button class="view-ach-btn" onclick="openAchievements('${p[0]}')">🏆 Thành tựu</button></div><b style="color:var(--p)">${p[2]} ELO</b></div>`).join('') : '<div style="padding:10px; text-align:center; color:#ccc; font-size:0.8em">Chưa có ai</div>'}</div>`;
+            const playersInTier = sorted.filter(p => {
+                if (idx === 0) return p[2] >= minElo;
+                return p[2] >= minElo && p[2] < tiers[idx-1];
+            });
+            html += `
+            <div class="rank-group ${info.g || ''}">
+                <div class="rank-group-header ${info.bg}"><span>${info.ic} ${info.n}</span><span>${playersInTier.length} VĐV</span></div>
+                ${playersInTier.length > 0 ? playersInTier.map(p => `
+                    <div class="player-row">
+                        <div class="player-info-left">
+                            <span class="player-name"><b>${p[1]}</b></span>
+                            <button class="view-ach-btn" onclick="openAchievements('${p[0]}')">🏆 Thành tựu</button>
+                        </div>
+                        <span class="player-elo">${p[2]} ELO</span>
+                    </div>`).join('') : '<div style="padding:10px; text-align:center; color:#ccc;">Trống...</div>'}
+            </div>`;
         });
         document.getElementById('playerList').innerHTML = html;
     }
 
-    async function loadHistory() {
-        const div = document.getElementById('matchHistory');
-        div.innerHTML = "🔄 Đang tải lịch sử...";
-        const res = await fetch(`${SCRIPT_URL}?action=getMatches`);
-        const json = await res.json();
-        if(json.status === "success" && json.data.length > 0) {
-            div.innerHTML = json.data.reverse().map(m => {
-                const date = new Date(m[7]).toLocaleString('vi-VN', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
-                const score = String(m[4]);
-                const s = score.split('-');
-                const c1 = parseInt(s[0]) > parseInt(s[1]) ? ' <span style="color:#FFD700">👑</span>' : '';
-                const c2 = parseInt(s[1]) > parseInt(s[0]) ? ' <span style="color:#FFD700">👑</span>' : '';
-                return `<div class="history-card"><span class="hist-date">${date} | ${m[1] === 'singles' ? 'Đơn' : 'Đôi'}</span>
-                    <div class="hist-players"><div class="team-name" style="text-align:left;">${m[2]}${c1}</div><div class="hist-score">${score}</div><div class="team-name" style="text-align:right;">${c2}${m[3]}</div></div>
-                    <div style="text-align:center; font-size:0.75em; color:var(--success); margin-top:5px; font-weight:bold;">Biến động: ±${m[5]} ELO</div></div>`;
-            }).join('');
+    async function openAchievements(id) {
+        const modal = document.getElementById('achModal');
+        modal.style.display = "block";
+        
+        const p = globalPlayers.find(x => x[0] == id);
+        if (!p) {
+            alert("❌ Lỗi!");
+            modal.style.display = "none";
+            return;
+        }
+        
+        const rInfo = getRankInfo(p[2]);
+        document.getElementById('modalName').innerText = p[1];
+        document.getElementById('modalRankInfo').innerText = `${rInfo.ic} ${rInfo.n} - ${p[2]} ELO`;
+        document.getElementById('achGridContainer').innerHTML = '<p style="text-align:center; padding:20px;">🔄 Đang tải...</p>';
+        
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getPlayerStats&playerId=${id}`);
+            const json = await res.json();
+            
+            const s = json.stats || {
+                wins: p[4] || 0,
+                maxStreak: 0,
+                morningGames: 0,
+                nightGames: 0,
+                comebacks: 0,
+                giantKills: 0,
+                uniqueOpponents: 0,
+                isFirst: false
+            };
+            
+            const totalMatches = p[3] || 1;
+            const winRate = s.wins / totalMatches;
+            
+            const cats = [
+                { t: '🔥 CHIẾN THẮNG', a: [
+                    {n:'First Blood', i:'🥇', v: s.wins >= 1},
+                    {n:'Hot Streak', i:'🔥', v: (s.maxStreak||0) >= 3},
+                    {n:'On Fire', i:'⚡', v: (s.maxStreak||0) >= 5},
+                    {n:'Unstoppable', i:'💥', v: (s.maxStreak||0) >= 10},
+                    {n:'Legendary', i:'👑', v: (s.maxStreak||0) >= 20},
+                    {n:'Veteran', i:'🎖️', v: s.wins >= 10},
+                    {n:'Champion', i:'🏅', v: s.wins >= 25},
+                    {n:'Legend', i:'🏆', v: s.wins >= 50}
+                ]},
+                { t: '📊 THỐNG KÊ', a: [
+                    {n:'Giant Killer', i:'😈', v: (s.giantKills||0) >= 1},
+                    {n:'Perfect 70', i:'💯', v: (winRate >= 0.7 && totalMatches >= 20)},
+                    {n:'Consistent', i:'📈', v: (winRate >= 0.6 && totalMatches >= 30)},
+                    {n:'Grinder', i:'💪', v: totalMatches >= 30},
+                    {n:'Warrior', i:'⚔️', v: totalMatches >= 50},
+                    {n:'Master', i:'🥋', v: totalMatches >= 100}
+                ]},
+                { t: '👑 RANK', a: [
+                    {n:'Vàng', i:'🟡', v: p[2] >= 1000},
+                    {n:'Bạch Kim', i:'💎', v: p[2] >= 1200},
+                    {n:'Kim Cương', i:'💠', v: p[2] >= 1500},
+                    {n:'Cao Thủ', i:'🔮', v: p[2] >= 1800},
+                    {n:'Đại Cao Thủ', i:'👑', v: p[2] >= 2100},
+                    {n:'Huyền Thoại', i:'🏆', v: p[2] >= 2400}
+                ]},
+                { t: '🌟 ĐẶC BIỆT', a: [
+                    {n:'Comeback', i:'🦅', v: (s.comebacks||0) >= 1},
+                    {n:'Early Bird', i:'🌅', v: (s.morningGames||0) >= 5},
+                    {n:'Night Owl', i:'🦉', v: (s.nightGames||0) >= 5},
+                    {n:'Số 1', i:'🎖️', v: s.isFirst === true},
+                    {n:'Butterfly', i:'🦋', v: (s.uniqueOpponents||0) >= 10}
+                ]}
+            ];
+
+            let totalUnlocked = 0;
+            const totalAch = cats.reduce((sum, cat) => sum + cat.a.length, 0);
+            
+            let html = "";
+            cats.forEach(cat => {
+                html += `<div style="background:#eee; padding:8px; border-radius:8px; margin-top:15px; font-size:0.85em; font-weight:bold;">${cat.t}</div><div class="ach-grid">`;
+                cat.a.forEach(ach => {
+                    if(ach.v) totalUnlocked++;
+                    html += `<div class="ach-card ${ach.v ? 'unlocked' : ''}"><span class="ach-icon">${ach.i}</span><span class="ach-name">${ach.n}</span></div>`;
+                });
+                html += `</div>`;
+            });
+
+            const pct = Math.round((totalUnlocked / totalAch) * 100);
+            document.getElementById('achBar').style.width = pct + "%";
+            document.getElementById('achText').innerText = `${totalUnlocked}/${totalAch} (${pct}%)`;
+            document.getElementById('achGridContainer').innerHTML = html;
+            
+        } catch(error) {
+            document.getElementById('achGridContainer').innerHTML = `<p style="text-align:center; color:red; padding:20px;">❌ ${error.message}</p>`;
         }
     }
 
-    async function openAchievements(id) {
-        const container = document.getElementById('achGridContainer');
-        container.innerHTML = "🔄 Đang tính toán...";
-        document.getElementById('achModal').style.display = "block";
-        const p = globalPlayers.find(x => x[0] == id);
-        document.getElementById('modalName').innerText = "VĐV: " + p[1];
-        document.getElementById('modalRankInfo').innerText = `Hạng: ${getRankInfo(p[2]).n} (${p[2]} ELO)`;
-
-        const res = await fetch(`${SCRIPT_URL}?action=getPlayerStats&playerId=${id}`);
-        const json = await res.json();
-        const s = json.stats;
-
-        const db = {
-            win: [{n:'First Blood', i:'🥇', d:'Thắng trận đầu', v: s.wins >= 1}, {n:'Hot Streak', i:'🔥', d:'Thắng 3 liên tiếp', v: s.maxStreak >= 3}, {n:'On Fire', i:'⚡', d:'Thắng 5 liên tiếp', v: s.maxStreak >= 5}, {n:'Unstoppable', i:'💥', d:'Thắng 10 liên tiếp', v: s.maxStreak >= 10}, {n:'Legendary', i:'👑', d:'Thắng 20 liên tiếp', v: s.maxStreak >= 20}, {n:'Veteran', i:'🎖️', d:'Thắng 10 trận', v: s.wins >= 10}, {n:'Champion', i:'🏅', d:'Thắng 25 trận', v: s.wins >= 25}, {n:'Legend', i:'🏆', d:'Thắng 50 trận', v: s.wins >= 50}],
-            stats: [{n:'Giant Killer', i:'😈', d:'Thắng người +300 ELO', v: s.giantKills >= 1}, {n:'Perfect 70', i:'💯', d:'Winrate 70% (20+ trận)', v: (s.wins/p[3] >= 0.7 && p[3] >= 20)}, {n:'Consistent', i:'📈', d:'Winrate 60% (30+ trận)', v: (s.wins/p[3] >= 0.6 && p[3] >= 30)}, {n:'Grinder', i:'💪', d:'Chơi 30 trận', v: p[3] >= 30}, {n:'Warrior', i:'⚔️', d:'Chơi 50 trận', v: p[3] >= 50}, {n:'Master', i:'🥋', d:'Chơi 100 trận', v: p[3] >= 100}],
-            rank: [{n:'Vàng', i:'🟡', d:'Đạt rank Vàng', v: p[2] >= 1000}, {n:'Bạch Kim', i:'💎', d:'Đạt rank Bạch Kim', v: p[2] >= 1200}, {n:'Kim Cương', i:'💠', d:'Đạt rank Kim Cương', v: p[2] >= 1500}, {n:'Cao Thủ', i:'🔮', d:'Đạt rank Cao Thủ', v: p[2] >= 1800}, {n:'Đại Cao Thủ', i:'👑', d:'Đạt rank ĐCT', v: p[2] >= 2100}, {n:'Huyền Thoại', i:'🏆', d:'Đạt rank HT', v: p[2] >= 2400}],
-            special: [{n:'Comeback', i:'🦅', d:'Thắng sau chuỗi thua 3', v: s.comebacks >= 1}, {n:'Early Bird', i:'🌅', d:'5 trận sáng (6-9h)', v: s.morningGames >= 5}, {n:'Night Owl', i:'🦉', d:'5 trận tối (18-22h)', v: s.nightGames >= 5}, {n:'Số 1', i:'🎖️', d:'VĐV đầu tiên của giải', v: s.isFirst}, {n:'Butterfly', i:'🦋', d:'Đánh với 10 người khác', v: s.uniqueOpponents >= 10}]
-        };
-
-        let html = "";
-        const categories = [{t: '🔥 CHIẾN THẮNG', d: db.win}, {t: '📊 THỐNG KÊ', d: db.stats}, {t: '👑 CẤP BẬC', d: db.rank}, {t: '🌟 ĐẶC BIỆT', d: db.special}];
-        categories.forEach(cat => {
-            html += `<div style="background:#f0f0f0; padding:5px 10px; border-radius:5px; margin:15px 0 10px; font-size:0.8em; font-weight:bold;">${cat.t}</div><div class="ach-grid">`;
-            cat.d.forEach(a => { html += `<div class="ach-card ${a.v ? 'unlocked' : ''}"><span class="ach-icon">${a.i}</span><span class="ach-name">${a.n}</span><span class="ach-desc">${a.d}</span></div>`; });
-            html += `</div>`;
-        });
-        container.innerHTML = html;
+    async function loadHistory() {
+        const div = document.getElementById('matchHistory');
+        div.innerHTML = "🔄 Đang tải...";
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getMatches`);
+            const json = await res.json();
+            if(json.status === "success" && json.data.length > 0) {
+                div.innerHTML = json.data.reverse().map(m => {
+                    const date = new Date(m[7]).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+                    const type = m[1] === 'singles' ? '🏸 Đơn' : '👥 Đôi';
+                    let score = String(m[4]).trim();
+                    const scores = score.split('-');
+                    const s1 = parseInt(scores[0]) || 0;
+                    const s2 = parseInt(scores[1]) || 0;
+                    const crown1 = s1 > s2 ? ' <span style="color:#FFD700;">👑</span>' : '';
+                    const crown2 = s2 > s1 ? ' <span style="color:#FFD700;">👑</span>' : '';
+                    return `
+                    <div class="history-card">
+                        <span class="hist-date">${date}</span>
+                        <span class="hist-type">${type}</span>
+                        <div class="hist-players">
+                            <div class="team-name">${m[2]}${crown1}</div>
+                            <div class="hist-score">${score}</div>
+                            <div class="team-name" style="text-align:right">${crown2}${m[3]}</div>
+                        </div>
+                        <div class="hist-elo">±${m[5]} ELO</div>
+                    </div>`;
+                }).join('');
+            } else {
+                div.innerHTML = "<p style='text-align:center; color:#999; padding:20px;'>Chưa có trận nào</p>";
+            }
+        } catch(e) {
+            div.innerHTML = "<p style='text-align:center; color:red; padding:20px;'>❌ Lỗi</p>";
+        }
     }
 
     function closeModal() { document.getElementById('achModal').style.display = "none"; }
-    function setMode(m) { currentMode = m; document.getElementById('btnS').style.background = m==='singles'?'var(--s)':'#ccc'; document.getElementById('btnD').style.background = m==='doubles'?'var(--s)':'#ccc'; document.getElementById('t1p2').style.display = m==='doubles'?'block':'none'; document.getElementById('t2p2').style.display = m==='doubles'?'block':'none'; }
-    function renderSelects() { const h = '<option value="">--VĐV--</option>' + globalPlayers.map(p => `<option value="${p[0]}">${p[1]}</option>`).join(''); document.querySelectorAll('.p-select').forEach(s => s.innerHTML = h); }
-    async function recordMatch() { /* Giữ nguyên logic POST của bạn */ }
-    async function addPlayer() { /* Giữ nguyên logic POST của bạn */ }
+    function switchTab(id) {
+        document.querySelectorAll('.tab, .tab-content').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        document.getElementById(id).classList.add('active');
+        if(id === 'history') loadHistory();
+    }
+    function setMode(m) {
+        currentMode = m;
+        document.getElementById('btnS').style.background = m === 'singles' ? 'var(--s)' : '#ccc';
+        document.getElementById('btnD').style.background = m === 'doubles' ? 'var(--s)' : '#ccc';
+        document.getElementById('t1p2').style.display = m === 'doubles' ? 'block' : 'none';
+        document.getElementById('t2p2').style.display = m === 'doubles' ? 'block' : 'none';
+    }
+    function renderSelects() {
+        const h = '<option value="">--VĐV--</option>' + globalPlayers.map(p => `<option value="${p[0]}">${p[1]}</option>`).join('');
+        document.querySelectorAll('.p-select').forEach(s => s.innerHTML = h);
+    }
+    async function recordMatch() {
+        const p1 = document.getElementById('t1p1').value, p2 = document.getElementById('t1p2').value;
+        const p3 = document.getElementById('t2p1').value, p4 = document.getElementById('t2p2').value;
+        const s1 = parseInt(document.getElementById('s1').value), s2 = parseInt(document.getElementById('s2').value);
+        const t1Ids = [p1, p2].filter(i => i), t2Ids = [p3, p4].filter(i => i);
+        const d = { action: 'recordMatch', data: { type: currentMode, team1Ids: t1Ids, team2Ids: t2Ids, team1Names: t1Ids.map(id => globalPlayers.find(p => p[0] == id)[1]), team2Names: t2Ids.map(id => globalPlayers.find(p => p[0] == id)[1]), score: s1 + "-" + s2, eloChange: 20, winner: s1 > s2 ? 1 : 2 } };
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d)});
+        alert("✅ Đã lưu!"); connect();
+    }
+    async function addPlayer() {
+        const name = document.getElementById('newName').value.trim();
+        if(!name) { alert("❌ Nhập tên!"); return; }
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addPlayer', data: { name: name }})});
+        alert("✅ Đã thêm!"); document.getElementById('newName').value = ''; connect();
+    }
 </script>
 </body>
 </html>
